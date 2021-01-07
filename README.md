@@ -40,3 +40,32 @@ Postępujemy ze sprawdzaniem dopóki nie skończą nam się elementy do rozważe
     }
 }
 ```
+Powyższe rozwiązanie to rozwiązanie naiwne, przez co jego złożoność wynosi O(2^n). Programowanie dynamiczne polega na tym, że przechowujemy wyniki operacji, przez co nie musimy ich ponownie obliczać przy kolejnych krokach. Do tego celu skorzystamy z dwuwymiarowej tablicy, gdzie jeden wymiar będzie miał rozmiar n, a drugi c.
+
+```cpp
+int max(int a, int b) { return (a > b) ? a : b; } 
+
+int KnapsackRec(int n, int c, int weight[], int value[], int *values) {
+    int result;
+    // Jezeli mamy obliczony wynik dla danej kombinacji, po prostu go zwracamy
+    if(*((values+n*n) + c) != -1){
+        result = *((values+n*n) + c);
+    }
+    // Jezeli skonczyly nam sie elementy lub pojemnosc, zwracamy zero
+    if(n == 0 || c == 0) {
+        result = 0;
+    // waga przedmiotu jest wieksza od dostepnego miejsca, wiec przechodzimy do kolejnego elementu
+    }else if(weight[n - 1] > c) {
+        result = KnapsackRec(n - 1, c, weight, value, values);
+    }else {
+        // porownujemy wybranie elementu i jego niewybranie, wybieramy co nam daje lepszy rezultat
+        int tmp1 = KnapsackRec(n - 1, c, weight, value, values);
+        int tmp2 = value[n - 1] + KnapsackRec(n - 1, c - weight[n - 1], weight, value, values);
+        result = max(tmp1, tmp2);
+    }
+    // zapisujemy wynik operacji w odpowiedniej komorce w tablicy dwuwymiarowej
+    *((values+n*n) + c) = result;
+    return result;
+}
+```
+Dzięki temu podejściu złożoność programu wynosi maksymalnie O(nc), co jest znacznie lepszym wynikiem niż O(2^n).
